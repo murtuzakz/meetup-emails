@@ -15,6 +15,6 @@ You can get these quite easily.
 * Click on any member
 * Copy that request as curl (using browser debugger tools)
 * In the above curl look for a cookie name MEETUP_MEMBER
-  this cookie's value will contain parameters like : id=<your meetup id> and 
-  timestamp=<your group register timestamp>
-  and the string s=<some string>
+  this cookie's value will contain parameters like : `id=<your meetup id>` and 
+  `timestamp=<your group register timestamp>`
+  and the string `s=<some string>`
