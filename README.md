@@ -11,7 +11,7 @@ The script is particularly useful, when some groups require email id as part of 
 To run this script, you will need your meetup id, your membership timestamp, and another string from meetup.
 
 You can get these quite easily.
-* Go to the meetup groups members page
+* Go to the meetup groups members page (Example : This is [an example link]( http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/)
 * Click on any member
 * Copy that request as curl (using browser debugger tools)
 * In the above curl look for a cookie name MEETUP_MEMBER
