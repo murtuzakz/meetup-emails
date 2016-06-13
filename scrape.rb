@@ -34,16 +34,20 @@ class MeetupGroupScraper
     search
     set_max_offset
     while !finished? do
-      member_links = @page.links.select do |link|
-        !link.href.nil?  && link.href.match(/#{ARGV[0]}(\d+)/) && link.text.length > 0 && link.dom_class == "memName"
-      end.map do |link|
-        {href: link.href, name: link.text}
-      end.uniq do |a|
-        a[:href]
-      end
+      member_links = get_member_links
       @current_offset += member_links.count
       fetch_member_info(member_links)
       search
+    end
+  end
+
+  def get_member_links
+    @page.links.select do |link|
+      !link.href.nil?  && link.href.match(/#{ARGV[0]}(\d+)/) && link.text.length > 0 && link.dom_class == "memName"
+    end.map do |link|
+      {href: link.href, name: link.text}
+    end.uniq do |a|
+      a[:href]
     end
   end
 
