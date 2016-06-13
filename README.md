@@ -1,12 +1,15 @@
 # meetup-emails
 Get emails of users part of a meetup group
 
-How to use : 
+## How to use : 
 For some meetup groups that require you to fillup a form before you can be added as member, this script allows you to fetch the information provided by the members of that group.
 
 The script is particularly useful, when some groups require email id as part of that form.
 
+## Running the script
+
 To run this script, you will need your meetup id, your membership timestamp, and another string from meetup.
+
 You can get these quite easily.
 1. Go to the meetup groups members page
 2. Click on any member
