@@ -1,3 +1,4 @@
+# ruby scrape.rb Small-Business-from-Concept-to-Startup http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/ temp_good.csv
 require 'mechanize'
 require 'tsort'
 require 'rack'
@@ -9,8 +10,7 @@ class MeetupGroupScraper
   def initialize
     @agent = Mechanize.new
     @agent.user_agent_alias = 'Mac Safari'
-    @base_url = 'http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/'
-    @url = URI 'http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/'
+    @base_url = ARGV[1]
     @url = URI @base_url
     @current_offset = 0
     @max_offset = 1
@@ -48,10 +48,7 @@ class MeetupGroupScraper
       fetch_member_info(member_links)
     end
   end
-  # 
-  # curl 'http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/205604732/' -H 'Cookie: MEETUP_MEMBER="id=30428101&status=1&timestamp=1464103120&bs=0&tz=Asia%2FCalcutta&zip=meetup5&country=in&city=Chennai&state=&lat=13.09&lon=80.27&ql=false&s=af4345eb37115bc6ac98f89f6f4692acec0aea87&scope=ALL";'
-  #
-
+  
   def fetch_member_info(member_links)
     member_results = []
     member_links.each do |member|
@@ -81,7 +78,7 @@ class MeetupGroupScraper
   end
 
   def write_to_csv(results)
-    CSV.open("temp_good.csv", "ab") do |csv|
+    CSV.open(ARGV[2], "ab") do |csv|
       unless @header_created
         csv << results.first.keys  
         @header_created = true
