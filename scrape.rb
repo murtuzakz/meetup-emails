@@ -1,4 +1,4 @@
-# ruby scrape.rb Small-Business-from-Concept-to-Startup http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/ temp_good.csv 30428102 1464103120 af4345eb37115bc6ac98f89f6f4692acec0aea87
+# ruby scrape.rb http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/ 30428102 1464103120 af4345eb37115bc6ac98f89f6f4692acec0aea87
 require 'mechanize'
 require 'tsort'
 require 'rack'
@@ -10,7 +10,7 @@ class MeetupGroupScraper
   def initialize
     @agent = Mechanize.new
     @agent.user_agent_alias = 'Mac Safari'
-    @base_url = ARGV[1]
+    @base_url = ARGV[0]
     @url = URI @base_url
     @current_offset = 0
     @max_offset = 1
@@ -38,7 +38,7 @@ class MeetupGroupScraper
       end
       @max_offset = offsets.max
       member_links = @page.links.select do |link|
-        !link.href.nil?  && link.href.match(/#{ARGV[1]}(\d+)/) && link.text.length > 0 && link.dom_class == "memName"
+        !link.href.nil?  && link.href.match(/#{ARGV[0]}(\d+)/) && link.text.length > 0 && link.dom_class == "memName"
       end.map do |link|
         {href: link.href, name: link.text}
       end.uniq do |a|
@@ -72,7 +72,7 @@ class MeetupGroupScraper
   end
   
   def build_cookie_value
-    "id=#{ARGV[3]}&status=1&timestamp=#{ARGV[4]}&bs=0&ql=false&s=#{ARGV[5]}&scope=ALL"
+    "id=#{ARGV[1]}&status=1&timestamp=#{ARGV[2]}&bs=0&ql=false&s=#{ARGV[3]}&scope=ALL"
   end
 
   def cookie_set_up!
@@ -82,7 +82,7 @@ class MeetupGroupScraper
   end
 
   def write_to_csv(results)
-    CSV.open(ARGV[2], "ab") do |csv|
+    CSV.open("results.csv", "ab") do |csv|
       unless @header_created
         csv << results.first.keys  
         @header_created = true
