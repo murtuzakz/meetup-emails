@@ -2,6 +2,7 @@ require 'mechanize'
 require 'tsort'
 require 'rack'
 require 'pry'
+require 'csv'
 
 class MeetupGroupScraper
 
@@ -10,12 +11,13 @@ class MeetupGroupScraper
     @agent.user_agent_alias = 'Mac Safari'
     @base_url = 'http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/'
     @url = URI 'http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/'
+    @url = URI @base_url
     @current_offset = 0
     @max_offset = 1
     @search_params = {offset: @current_offset, sort: 'join_date', desc: 1}
     params = Rack::Utils.build_query(@search_params)
     @search_url = @url + "?#{params}" 
-    @all_member_results = []
+    @header_created = false
   end
 
   def finished?
@@ -35,37 +37,63 @@ class MeetupGroupScraper
         !a.href.nil? && a.href.split(@base_url + "?offset=")[1].split("&").first.to_i
       end
       @max_offset = offsets.max
-
-      member_links = @page.links.select do |link| 
-        !link.href.nil?  && link.href.match(/http:\/\/www.meetup.com\/Small-Business-from-Concept-to-Startup\/members\/(\d+)/)
-      end.map(&:href).uniq
+      member_links = @page.links.select do |link|
+        !link.href.nil?  && link.href.match(/http:\/\/www.meetup.com\/Small-Business-from-Concept-to-Startup\/members\/(\d+)/) && link.text.length > 0 && link.dom_class == "memName"
+      end.map do |link|
+        {href: link.href, name: link.text}
+      end.uniq do |a|
+        a[:href]
+      end
       @current_offset += member_links.count
       fetch_member_info(member_links)
     end
-
-    
   end
   # 
   # curl 'http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/205604732/' -H 'Cookie: MEETUP_MEMBER="id=30428101&status=1&timestamp=1464103120&bs=0&tz=Asia%2FCalcutta&zip=meetup5&country=in&city=Chennai&state=&lat=13.09&lon=80.27&ql=false&s=af4345eb37115bc6ac98f89f6f4692acec0aea87&scope=ALL";'
   #
 
   def fetch_member_info(member_links)
-    hash = {}
+    member_results = []
     member_links.each do |member|
-      cookie = Mechanize::Cookie.new :domain => '.meetup.com', :name => "MEETUP_MEMBER", :value => "id=30428102&status=1&timestamp=1464103120&bs=0&ql=false&s=af4345eb37115bc6ac98f89f6f4692acec0aea87&scope=ALL", :path => '/'
-      @agent.cookie_jar.clear!
-      @agent.cookie_jar.add!(cookie)
-      @member_page = @agent.get member
+      cookie_set_up!
+      hash = {}
+      @member_page = @agent.get member[:href]
+      hash[:ma_name] = member[:name]
       @member_page.root.css('.D_memberProfileContentItem').each_with_index do |node, i|
         if i > 2
           question = node.children[1].children.to_html
+          next if question == "Networks"
           answer = node.children[3].children.to_html
           hash[node.children[1].children.to_html] = answer
         end
       end
-      @all_member_results << hash
+      member_results << hash
       p hash
       puts "\n ==== \n"
+    end
+    write_to_csv(member_results)
+  end
+
+  def cookie_set_up!
+    cookie = Mechanize::Cookie.new :domain => '.meetup.com', :name => "MEETUP_MEMBER", :value => "id=30428102&status=1&timestamp=1464103120&bs=0&ql=false&s=af4345eb37115bc6ac98f89f6f4692acec0aea87&scope=ALL", :path => '/'
+    @agent.cookie_jar.clear!
+    @agent.cookie_jar.add!(cookie)
+  end
+
+  def write_to_csv(results)
+    CSV.open("temp_good.csv", "ab") do |csv|
+      unless @header_created
+        csv << results.first.keys  
+        @header_created = true
+      else
+      end
+      results.each do |res|
+        begin
+          csv << res.values
+        rescue Exception => e
+          puts e.to_s
+        end
+      end
     end
   end
 
