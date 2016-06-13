@@ -69,8 +69,6 @@ class MeetupGroupScraper
         end
       end
       member_results << hash
-      p hash
-      puts "\n ==== \n"
     end
     write_to_csv(member_results)
   end
@@ -90,15 +88,8 @@ class MeetupGroupScraper
       unless @header_created
         csv << results.first.keys  
         @header_created = true
-      else
       end
-      results.each do |res|
-        begin
-          csv << res.values
-        rescue Exception => e
-          puts e.to_s
-        end
-      end
+      results.each {|res| csv << res.values } 
     end
   end
 
