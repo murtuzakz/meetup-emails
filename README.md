@@ -13,7 +13,7 @@ To run this script, you will need your meetup id, your membership timestamp, and
 You can get these quite easily.
 * Go to the meetup groups members page (Example : This is [an example link]( http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/)
 * Click on any member [Example link](http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/30428102/)
-* Copy that request as curl (using browser debugger tools)
+* Copy that request as curl (using browser debugger tools) ![See screenshot](http://s31.postimg.org/e0iy85pzv/Screen_Shot_2016_06_13_at_3_06_42_pm.png)
 * In the above curl look for a cookie name MEETUP_MEMBER
   this cookie's value will contain parameters like : `id=<your meetup id>` and 
   `timestamp=<your group register timestamp>`
