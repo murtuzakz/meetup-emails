@@ -1,3 +1,7 @@
+# 1st Argument is the group members url that you want to scrape members of.
+# 2nd Argument is meetup member id
+# 3rd argument is timestamp of when u got accepted in the group
+# 4th argument is some string
 # ruby scrape.rb http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/ 30428102 1464103120 af4345eb37115bc6ac98f89f6f4692acec0aea87
 require 'mechanize'
 require 'tsort'
