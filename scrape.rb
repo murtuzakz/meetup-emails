@@ -38,7 +38,7 @@ class MeetupGroupScraper
       end
       @max_offset = offsets.max
       member_links = @page.links.select do |link|
-        !link.href.nil?  && link.href.match(/http:\/\/www.meetup.com\/Small-Business-from-Concept-to-Startup\/members\/(\d+)/) && link.text.length > 0 && link.dom_class == "memName"
+        !link.href.nil?  && link.href.match(/#{ARGV[1]}(\d+)/) && link.text.length > 0 && link.dom_class == "memName"
       end.map do |link|
         {href: link.href, name: link.text}
       end.uniq do |a|
@@ -48,7 +48,7 @@ class MeetupGroupScraper
       fetch_member_info(member_links)
     end
   end
-  
+
   def fetch_member_info(member_links)
     member_results = []
     member_links.each do |member|
