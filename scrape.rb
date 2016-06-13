@@ -1,4 +1,4 @@
-# ruby scrape.rb Small-Business-from-Concept-to-Startup http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/ temp_good.csv
+# ruby scrape.rb Small-Business-from-Concept-to-Startup http://www.meetup.com/Small-Business-from-Concept-to-Startup/members/ temp_good.csv 30428102 1464103120 af4345eb37115bc6ac98f89f6f4692acec0aea87
 require 'mechanize'
 require 'tsort'
 require 'rack'
@@ -70,9 +70,13 @@ class MeetupGroupScraper
     end
     write_to_csv(member_results)
   end
+  
+  def build_cookie_value
+    "id=#{ARGV[3]}&status=1&timestamp=#{ARGV[4]}&bs=0&ql=false&s=#{ARGV[5]}&scope=ALL"
+  end
 
   def cookie_set_up!
-    cookie = Mechanize::Cookie.new :domain => '.meetup.com', :name => "MEETUP_MEMBER", :value => "id=30428102&status=1&timestamp=1464103120&bs=0&ql=false&s=af4345eb37115bc6ac98f89f6f4692acec0aea87&scope=ALL", :path => '/'
+    cookie = Mechanize::Cookie.new :domain => '.meetup.com', :name => "MEETUP_MEMBER", :value => build_cookie_value, :path => '/'
     @agent.cookie_jar.clear!
     @agent.cookie_jar.add!(cookie)
   end
