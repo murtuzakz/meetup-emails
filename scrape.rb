@@ -17,7 +17,6 @@ class MeetupGroupScraper
     @base_url = ARGV[0]
     @url = URI @base_url
     @current_offset = 0
-    @max_offset = 1
     @search_params = {offset: @current_offset, sort: 'join_date', desc: 1}
     params = Rack::Utils.build_query(@search_params)
     @search_url = @url + "?#{params}" 
@@ -32,15 +31,9 @@ class MeetupGroupScraper
   # Entry point
 
   def run
+    search
+    set_max_offset
     while !finished? do
-      search
-      next_links = @page.links.select do |link| 
-        !link.href.nil?  && link.href.index(@base_url + "?offset=") == 0
-      end
-      offsets = next_links.map do |a|
-        !a.href.nil? && a.href.split(@base_url + "?offset=")[1].split("&").first.to_i
-      end
-      @max_offset = offsets.max
       member_links = @page.links.select do |link|
         !link.href.nil?  && link.href.match(/#{ARGV[0]}(\d+)/) && link.text.length > 0 && link.dom_class == "memName"
       end.map do |link|
@@ -50,7 +43,18 @@ class MeetupGroupScraper
       end
       @current_offset += member_links.count
       fetch_member_info(member_links)
+      search
     end
+  end
+
+  def set_max_offset
+    next_links = @page.links.select do |link| 
+        !link.href.nil?  && link.href.index(@base_url + "?offset=") == 0
+      end
+    offsets = next_links.map do |a|
+      !a.href.nil? && a.href.split(@base_url + "?offset=")[1].split("&").first.to_i
+    end
+    @max_offset = offsets.max
   end
 
   def fetch_member_info(member_links)
